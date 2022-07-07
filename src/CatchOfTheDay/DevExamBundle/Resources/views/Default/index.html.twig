@@ -1,0 +1,118 @@
+{% extends 'CatchOfTheDayDevExamBundle::base.html.twig' %}
+
+{% block title %}{{ parent() }} - Welcome{% endblock title %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/catchofthedaydevexam/css/views/Default/index.css') }}" />
+{% endblock stylesheets %}
+
+{% block body %}
+    <div class="container">
+        <div class="page-header">
+            <h3>
+                <img src="{{ asset('bundles/catchofthedaydevexam/images/cotd-logo.png') }}" />
+                CatchOfTheDay Developer Exam
+            </h3>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <p>
+                    This is an incomplete TODO list application based on Symfony 3 and Bootstrap 3. The TODO list items are to be serialised to JSON and saved in
+                    <code>src/CatchOfTheDay/DevExamBundle/Resources/data/todo-list.json.</code> We have already provided the <code>TodoListManager</code> service to read and write
+                    to this file. Look for <code>// TODO</code> comments inside <code>src/CatchOfTheDay/DevExamBundle</code> to complete the application. Please add validation to
+                    the text field in the Add New Item form - do not allow blank items to be added. You're welcome to use Javascript (jQuery is also included here) for anything.
+                </p>
+                <p>
+                    Bonus points:
+                </p>
+                <ul>
+                    <li>Add pagination to the table of TODO list items below.</li>
+                    <li>Provide the ability to edit existing TODO list items and change the text.</li>
+                    <li>Use AJAX instead of POSTing/redirecting to <code>addAction()</code> or <code>markAsCompleteAction()</code>.</li>
+                    <li>Provide a second interface to view Completed items, perhaps with the ability to 'uncomplete' items.</li>
+                    <li>Surprise us!</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="app-header">TODO List Application</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="well">
+                    <form class="form-horizontal" action="{{ path('add') }}" method="post">
+                        <h5>Add New Item</h5>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" id="todo-text-input" name="todo-text" placeholder="Text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <button type="submit" class="btn btn-primary">
+                                    Add
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-striped table-hover">
+                    <colgroup>
+                        <col style="width: 120px" />
+                        <col style="width: 200px" />
+                        <col />
+                        <col style="width: 135px" />
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Created Timestamp</th>
+                        <th>Text</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in items if not item.complete %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ item.created|date('d/m/Y g:i a') }}</td>
+                            <td>{{ item.text }}</td>
+                            <td>
+
+
+                                <a href="{{ path('delete_todo', { 'itemId': item.id }) }}" class="btn btn-danger">Delete</a>
+
+                                <a href="{{ path('mark_as_complete', { 'itemId': item.id }) }}" class="btn btn-sm btn-success">
+                                    Mark as Complete
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="pagination">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    {% for page in paginator  %}
+                        {{ page | raw }}
+                    {% endfor %}
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+
+{% endblock body %}

@@ -1,0 +1,304 @@
+{% extends 'CatchOfTheDayDevExamBundle::base.html.twig' %}
+
+{% block title %}{{ parent() }} - Welcome{% endblock title %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/catchofthedaydevexam/css/views/Default/index.css') }}" />
+{% endblock stylesheets %}
+
+{% block body %}
+    <div class="container">
+        {{ include("CatchOfTheDayDevExamBundle:partials:header.html.twig")}}
+
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="app-header">TODO List Application</h4>
+            </div>
+        </div>
+        <section  id="app" >
+            <div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="well">
+                            <section class="form-horizontal"  v-if="todo.editmode">
+                                <h5>Update Item</h5>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <input type="text" class="form-control" id="todo-text-input" name="todo-text" placeholder="Text" v-model="todo.text">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <button class="btn btn-danger" @click="cancelEdit">
+                                            Cancel
+                                        </button>
+                                        <button  class="btn btn-primary " @click="updateTodo">
+                                            Update
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
+                            <section class="form-horizontal" v-else>
+                                <h5>Add Item Item</h5>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <input type="text" class="form-control" id="todo-text-input" name="todo-text" placeholder="Text" v-model="todo.text">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <button class="btn btn-primary" @click="createTodo">
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
+                    <button type="button" class="btn btn-secondary" v-bind:class="{ active: fetchType=='all'}" @click="selectionSwitcher('all')">All</button>
+                    <button type="button" class="btn btn-secondary" v-bind:class="{ active: fetchType=='completed'}" @click="selectionSwitcher('completed')">Completed</button>
+                    <button type="button" class="btn btn-secondary" v-bind:class="{ active: fetchType=='pending'}" @click="selectionSwitcher('pending')">Pending</button>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-striped table-hover">
+                            <colgroup>
+                                <col style="width: 120px" />
+                                <col style="width: 200px" />
+                                <col />
+                                <col style="width: 135px" />
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Created Timestamp</th>
+                                <th>Text</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            <tr  v-for="(todo, index) in todos" :key="index" >
+                                <td>  ${index}</td>
+                                <td>  ${todo.created}</td>
+                                <td>  ${todo.text}</td>
+                                <td>  ${todo.complete}</td>
+                                <td>
+                                    <button class="btn btn-danger" @click="deleteTodo(todo.id)">Delete</button>
+                                    <button class="btn btn-default" @click="editTodo(todo)">Edit</button >
+                                    <button class="btn btn-sm btn-success" @click="markAsComplete(todo.id)"><span v-if="todo.complete"> Mark as Pending</span> <span v-else> Mark as Completed</span></button>
+                                </td>
+
+                            </tr>
+
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+                <div class="pagination">
+                    <nav aria-label="Page navigation example">
+                        <component :is="navigationMaker"   @paginate="paginate"></component>
+                    </nav>
+
+                </div>
+            </div>
+        </section>
+    </div>
+    <script type="text/javascript">
+        const app = new Vue({
+                el: '#app',
+                delimiters: ['${', '}'],
+                data(){
+                    return{
+                        todo:{text:'',editmode:false},
+                        todos:[],
+                        nav:[],
+                        ind:0,
+                        rpp:5,
+                        currentPage:1,
+                        fetchType:'all',
+                        localIndex:1
+                    }
+                },
+                mounted() {
+                    this.getAllTodos();
+                },
+                methods:{
+                    getAllTodos() {
+                        axios.get(`/api/page/${this.currentPage}/${this.rpp}/${this.fetchType}`)
+                            .then(res => {
+                                if(res.status == 200) {
+                                    this.todos = res.data.items;
+                                    this.nav = res.data.paginator.join('');
+                                    this.ind = res.data.ind;
+                                }
+                            })
+                            .catch(error => {
+                                Vue.toasted.show(`Error: something went wrong!`,{type: 'error',duration: 5000});
+                            })
+                    },
+                    createTodo() {
+                        if(this.validate(this.todo)) {
+                            axios.post(`/api/add`,this.todo)
+                                .then(res => {
+                                    if(res.status == 200) {
+                                        if(res.data.todos != undefined) {
+                                            var {message, todos} = res.data;
+                                            this.todos = todos.items;
+                                            this.nav = todos.paginator.join('');
+                                            this.ind = todos.ind;
+                                            Vue.toasted.show(`Success: ${message.notice}`,{type: message.type,duration: 5000});
+                                            this.todo={};
+                                            this.todo.editmode=false;
+                                        }
+                                        else
+                                            Vue.toasted.show(`Success: ${res.data.message.notice}`,{type: res.data.message.type,duration: 5000});
+                                    }
+                                })
+                                .catch(error => {
+                                    Vue.toasted.show(`Error: something went wrong!`,{type: 'error',duration: 5000});
+                                })
+                        }
+                    },
+                    updateTodo() {
+                        if(this.validate(this.todo)) {
+                            axios.post(`/api/items/${this.todo.id}/edit/page/${this.currentPage}/${this.rpp}/${this.fetchType}`, this.todo)
+                                .then(res => {
+                                    if (res.status == 200) {
+                                        if (res.data.todos != undefined) {
+                                            var {message, todos} = res.data;
+                                            this.todos = todos.items;
+                                            this.nav = todos.paginator.join('');
+                                            this.ind = todos.ind;
+                                            Vue.toasted.show(`Success: ${message.notice}`, {
+                                                type: message.type,
+                                                duration: 5000
+                                            });
+                                            this.todo = {};
+                                            this.todo.editmode = false;
+                                        }
+                                        else
+                                            Vue.toasted.show(`Success: ${res.data.message.notice}`, {
+                                                type: res.data.message.type,
+                                                duration: 5000
+                                            });
+                                    }
+                                })
+                                .catch(error => {
+                                    Vue.toasted.show(`Error: something went wrong!`, {type: 'error', duration: 5000});
+                                })
+                        }
+                    },
+                    deleteTodo(id) {
+                        axios.delete(`/api/items/${id}/delete/page/${this.currentPage}/${this.rpp}/${this.fetchType}`)
+                            .then(res => {
+                                if(res.status == 200) {
+                                        var {message, todos} = res.data;
+                                        this.todos = todos.items;
+                                        this.nav = todos.paginator.join('');
+                                        this.ind = todos.ind;
+                                        Vue.toasted.show(`Success: ${message.notice}`,{type: message.type,duration: 5000});
+                                        this.todo={};
+                                        this.todo.editmode=false;
+                                }
+                            })
+                            .catch(error => {
+                                Vue.toasted.show(`Error: something went wrong!`,{type: 'error',duration: 5000});
+                            })
+                    },
+                    paginate(action) {
+                        this.currentPage = action;
+                        this.getAllTodos();
+                    },
+                    markAsComplete(id){
+                        axios.get(`/api/items/${id}/mark-as-complete/page/${this.currentPage}/${this.rpp}/${this.fetchType}`)
+                            .then(res => {
+                                if(res.status == 200) {
+                                        var {message, todos} = res.data;
+                                        this.todos = todos.items;
+                                        this.nav = todos.paginator.join('');
+                                        this.ind = todos.ind;
+                                        Vue.toasted.show(`Success: ${message.notice}`,{type: message.type,duration: 5000});
+                                        this.todo={};
+                                        this.todo.editmode=false;
+                                }
+                            })
+                            .catch(error => {
+                                Vue.toasted.show(`Error: something went wrong!`,{type: 'error',duration: 5000});
+                            })
+                    },
+                    selectionSwitcher(selector){
+                        this.fetchType = selector;
+                        this.currentPage = 1;
+                        this.getAllTodos();
+                    },
+                    editTodo(todo){
+                        this.todo = {...todo};
+                        this.todo.editmode = true;
+                    },
+                    cancelEdit(){
+                        this.todo.editmode = false;
+                        this.todo.text = "";
+                    },
+                    increment() {
+                        return this.localIndex;
+                    },
+                    validate({text}) {
+                        if (text == "" || text == undefined) {
+                            Vue.toasted.show(`Error: Todo cannot be empty!`, {type: 'error', duration: 5000});
+                            return false;
+                        }
+                        else if(! /^[a-zA-Z0-9 ]+$/.test(text))
+                        {
+                            Vue.toasted.show(`Error: Todo can only have alphanumeric and spaces!`, {
+                                type: 'error',
+                                duration: 5000
+                            });
+                            return false;
+                        }
+                        else if(text.length < 5 || text.length > 200 )
+                        {
+                            Vue.toasted.show(`Error: Todo cannot be longer then 200 chars and less then 5!`, {
+                                type: 'error',
+                                duration: 5000
+                            });
+                            return false;
+                        }
+
+                        else {
+                            return true;
+                        }
+                    }
+
+                },
+                computed: {
+                    navigationMaker: function () {
+                        return {
+                            template: `<ul class="pagination">${this.nav}</ul>`,
+                            methods:{
+                                paginate(event,action) {
+                                   this.$emit('paginate',action)
+                                },
+                            }
+                        }
+                    },
+
+                },
+
+            }
+        );
+        Vue.use(Toasted,{position:'bottom-right','duration':5000});
+
+
+        Vue.config.devtools = true;
+
+        window.__VUE_DEVTOOLS_GLOBAL_HOOK__.Vue = app.constructor;
+    </script>
+
+{% endblock body %}

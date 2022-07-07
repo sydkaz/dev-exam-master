@@ -1,0 +1,10 @@
+catch_of_the_day_dev_exam:
+    resource: "@CatchOfTheDayDevExamBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+
+api_controller:
+    resource: "@CatchOfTheDayDevExamBundle/Controller/ApiController.php"
+    type:     annotation
+    prefix:   /api

@@ -1,0 +1,46 @@
+{% extends 'CatchOfTheDayDevExamBundle::base.html.twig' %}
+
+{% block title %}{{ parent() }} - Welcome{% endblock title %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/catchofthedaydevexam/css/views/Default/index.css') }}" />
+{% endblock stylesheets %}
+
+{% block body %}
+    <div class="container">
+        {{ include("CatchOfTheDayDevExamBundle:partials:header.html.twig")}}
+
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="app-header">TODO List Application</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="well">
+                    <form class="form-horizontal" action="{{ path('edit_todo', { 'itemId': todo.id }) }}" method="post">
+                        <h5>Add New Item</h5>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" id="todo-text-input" name="todo-text" placeholder="Text" value="{{ todo.text }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <a href="{{ path('page_home') }}" class="btn btn-danger" >
+                                    Back
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    Update
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock body %}

@@ -1,0 +1,8 @@
+services:
+    catch_of_the_day_dev_exam.manager.todo_list:
+        class: CatchOfTheDay\DevExamBundle\Manager\TodoListManager
+        arguments: [ "@file_locator" ]
+
+    catch_of_the_day_dev_exam.test:
+        class: CatchOfTheDay\DevExamBundle\Manager\TestService
+        arguments: [ "@logger" ]

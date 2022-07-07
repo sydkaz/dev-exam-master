@@ -1,0 +1,22 @@
+<nav class="navbar navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#"><img src="/bundles/catchofthedaydevexam/images/cotd-logo.png" style="height: 25px"></a>
+        </div>
+
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                {#<li class="{{ app.request.get('_route') == 'page_home' ? 'active' }}"><a href="/">Home</a></li>#}
+                <li class="{#{{ app.request.get('_route_params')['status'] == 'all' ? 'active' }}#}"><a href="{{ path('page_status', { 'status': 'all' }) }}">View Non Completed Todos</a></li>
+                <li class="{#{{ app.request.get('_route_params')['status'] == 'completed' ? 'active' }}#}"><a href="{{ path('page_status', { 'status': 'completed' }) }}">View Completed Todos</a></li>
+                <li class="{#{{ app.request.get('_route_params')['status'] == 'completed' ? 'active' }}#}"><a href="{{ path('page_home_ajax') }}">Ajax Submit</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>

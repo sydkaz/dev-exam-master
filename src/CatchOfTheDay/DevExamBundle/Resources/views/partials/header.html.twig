@@ -1,0 +1,39 @@
+{% block header %}
+    {{ include("CatchOfTheDayDevExamBundle:partials:nav.html.twig")}}
+    <div class="page-header">
+        <h3>
+            <img src="{{ asset('bundles/catchofthedaydevexam/images/cotd-logo.png') }}"/>
+            CatchOfTheDay Developer Exam
+        </h3>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>
+                This is an incomplete TODO list application based on Symfony 3 and Bootstrap 3. The TODO list items are
+                to be serialised to JSON and saved in
+                <code>src/CatchOfTheDay/DevExamBundle/Resources/data/todo-list.json.</code> We have already provided the
+                <code>TodoListManager</code> service to read and write
+                to this file. Look for <code>// TODO</code> comments inside <code>src/CatchOfTheDay/DevExamBundle</code>
+                to complete the application. Please add validation to
+                the text field in the Add New Item form - do not allow blank items to be added. You're welcome to use
+                Javascript (jQuery is also included here) for anything.
+            </p>
+            <p>
+                Bonus points:
+            </p>
+            <ul>
+                <li>Add pagination to the table of TODO list items below.</li>
+                <li>Provide the ability to edit existing TODO list items and change the text.</li>
+                <li>Use AJAX instead of POSTing/redirecting to <code>addAction()</code> or
+                    <code>markAsCompleteAction()</code>.
+                </li>
+                <li>Provide a second interface to view Completed items, perhaps with the ability to 'uncomplete'
+                    items.
+                </li>
+                <li>Surprise us!</li>
+            </ul>
+        </div>
+    </div>
+    {{ include("CatchOfTheDayDevExamBundle:partials:panel.html.twig")}}
+{% endblock %}

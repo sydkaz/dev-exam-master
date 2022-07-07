@@ -1,0 +1,19 @@
+{% block all %}
+    {% set localIndex = ind+1 %}
+    {% for item in items if not item.complete %}
+        <tr>
+            <td>{{ localIndex }}</td>
+            <td>{{ item.created|date('d/m/Y g:i a') }}</td>
+            <td>{{ item.text }}</td>
+            <td>
+                <a href="{{ path('delete_todo', { 'itemId': item.id }) }}" class="btn btn-danger">Delete</a>
+                <a href="{{ path('edit_todo', { 'itemId': item.id }) }}" class="btn btn-default">Edit</a>
+                <a href="{{ path('mark_as_complete', { 'itemId': item.id }) }}" class="btn btn-sm btn-success">
+                    Mark as Complete
+                </a>
+            </td>
+        </tr>
+        {% set localIndex = localIndex + 1 %}
+
+    {% endfor %}
+{% endblock %}
